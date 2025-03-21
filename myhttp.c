@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-/* 实现一个简单的多线程 http/1.0 服务器 */
+/* 实现一个简单的多线程 http/1.1 服务器 */
 
 #define SERVER_PORT 80
 
@@ -145,6 +145,8 @@ void* do_http_request(void* pclient_sock) {
 			while (isspace(buf[j++]));//跳过空格
 			i = 0;
 
+			--j;
+
 			while (!isspace(buf[j]) && (i < sizeof(prot_ver) - 1)) {
 				prot_ver[i] = buf[j];
 				i++;
@@ -263,28 +265,28 @@ int  headers(int client_sock, FILE* resource, int status) {
 	switch (status)
 	{
 	case 200:
-		strcpy(buf, "HTTP/1.0 200 OK\r\n");
+		strcpy(buf, "HTTP/1.1 200 OK\r\n");
 		break;
 	case 400:
-		strcpy(buf, "HTTP/1.0 400 Bad Request\r\n");
+		strcpy(buf, "HTTP/1.1 400 Bad Request\r\n");
 		break;
 	case 404:
-		strcpy(buf, "HTTP/1.0 404 NOT FOUND\r\n");
+		strcpy(buf, "HTTP/1.1 404 NOT FOUND\r\n");
 		break;
 	case 500:
-		strcpy(buf, "HTTP/1.0 500 Internal Sever Error\r\n");
+		strcpy(buf, "HTTP/1.1 500 Internal Sever Error\r\n");
 		break;
 	case 501:
-		strcpy(buf, "HTTP/1.0 501 NOT IMPLEMENTED\r\n");
+		strcpy(buf, "HTTP/1.1 501 NOT IMPLEMENTED\r\n");
 		break;
 	default:
-		strcpy(buf, "HTTP/1.0 defualt\r\n");
+		strcpy(buf, "HTTP/1.1 defualt\r\n");
 		break;
 	}
 
 	strcat(buf, "Server: AgNO2 Server\r\n");
 	strcat(buf, "Content-Type: text/html\r\n");
-	strcat(buf, "Connection: Close\r\n");
+	strcat(buf, "Connection: keep-alive\r\n");
 
 	fileid = fileno(resource);
 
